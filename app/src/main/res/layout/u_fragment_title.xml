@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/background_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/img_description"
+        android:src="@drawable/img_copa"
+        tools:ignore="ImageContrastCheck" />
+
+    <TextView
+        android:id="@+id/tvNombreAPP"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="150sp"
+        android:paddingEnd="10sp"
+        android:text="@string/app_name"
+        android:textAlignment="viewEnd"
+        android:textColor="#AD1457"
+        android:textSize="50sp"
+        tools:ignore="RtlSymmetry,TextContrastCheck" />
+
+</FrameLayout>

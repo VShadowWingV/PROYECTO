@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">PROYECTO</string>
+    <string name="img_description">"Imagen copa "</string>
+    <string name="loserbracket_multijugador">LoserBracket/Multijugador</string>
+    <string name="comenzar">COMENZAR</string>
+    <string name="n_participantes">Nº Participantes</string>
+    <string name="bo_x">BOX/JpE</string>
+    <string name="n_rondas">Nº Rondas</string>
+    <string name="aniadir">Añadir</string>
+    <string name="placeholder">Placeholder</string>
+    <string name="alias">Alias</string>
+    <string name="nombre">Nombre</string>
+    <string name="hint_pools">Introduzca las pools</string>
+    <string name="resultado">Resultado</string>
+    <string name="siguiente">Siguiente</string>
+    <string name="anterior">Anterior</string>
+    <string name="next_round">NEXT ROUND</string>
+    <string name="scroll">Scroll</string>
+    <string name="b">B</string>
+    <string name="punct">Punct</string>
+    <string name="w_r">W/R</string>
+    <string name="generar_suizo">Generar Suizo</string>
+    <string name="generar_top_cut">Generar Top Cut</string>
+    <string name="fin_del_torneo">FIN DEL TORNEO</string>
+</resources>

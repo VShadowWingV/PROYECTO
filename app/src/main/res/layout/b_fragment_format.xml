@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:textAlignment="center">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/g_vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="205dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/g_horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="350dp" />
+
+    <CheckBox
+        android:id="@+id/cb_opc"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:text="@string/loserbracket_multijugador"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/g_vertical"
+        app:layout_constraintTop_toTopOf="@+id/g_horizontal"
+        tools:ignore="TextSizeCheck" />
+
+    <Button
+        android:id="@+id/bt_ini"
+        android:layout_width="150dp"
+        android:layout_height="70dp"
+        android:backgroundTint="#FF5722"
+        android:text="@string/comenzar"
+        android:textColor="#000000"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/g_vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/g_horizontal" />
+
+    <Spinner
+        android:id="@+id/sp_formato"
+        android:layout_width="150dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="117dp"
+        android:layout_marginEnd="25dp"
+        android:background="#FFFFFF"
+        android:padding="10sp"
+        app:layout_constraintBottom_toTopOf="@+id/g_horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/g_vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.053" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/g_horizontal_A_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="116.66dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/g_horizontal_A_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="233.33dp" />
+
+    <EditText
+        android:id="@+id/num_participantes"
+        android:layout_width="164dp"
+        android:layout_height="48dp"
+        android:autofillHints=""
+        android:background="#FFFFFF"
+        android:ems="10"
+        android:hint="@string/n_participantes"
+        android:inputType="number"
+        android:textColor="#000000"
+        android:textColorHint="#000000"
+        app:layout_constraintBottom_toTopOf="@+id/g_horizontal_A_1"
+        app:layout_constraintEnd_toStartOf="@+id/g_vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/num_rondas"
+        android:layout_width="164dp"
+        android:layout_height="48dp"
+        android:autofillHints=""
+        android:background="#FFFFFF"
+        android:ems="10"
+        android:hint="@string/n_rondas"
+        android:inputType="number"
+        android:textColor="#000000"
+        android:textColorHint="#000000"
+        app:layout_constraintBottom_toTopOf="@+id/g_horizontal_A_2"
+        app:layout_constraintEnd_toStartOf="@+id/g_vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/g_horizontal_A_1" />
+
+    <EditText
+        android:id="@+id/num_partidos_set"
+        android:layout_width="164dp"
+        android:layout_height="48dp"
+        android:autofillHints=""
+        android:background="#FFFFFF"
+        android:ems="10"
+        android:hint="@string/bo_x"
+        android:inputType="number"
+        android:textColor="#000000"
+        android:textColorHint="#000000"
+        app:layout_constraintBottom_toTopOf="@+id/g_horizontal"
+        app:layout_constraintEnd_toStartOf="@+id/g_vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/g_horizontal_A_2" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

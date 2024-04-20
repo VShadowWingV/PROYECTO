@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".PlayerActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="225dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/l_nombre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingStart="25sp"
+            android:text="@string/nombre"
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/et_nombre"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:ems="10"
+            android:hint="@string/placeholder"
+            android:inputType="text"
+            android:textColorHint="#546E7A"
+            tools:ignore="DuplicateSpeakableTextCheck,VisualLintTextFieldSize"
+            android:autofillHints="" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="225dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/l_alias"
+            android:layout_width="98dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingStart="25sp"
+            android:text="@string/alias"
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/et_alias"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:autofillHints=""
+            android:ems="10"
+            android:hint="@string/placeholder"
+            android:inputType="text"
+            android:textColorHint="#546E7A"
+            tools:ignore="VisualLintTextFieldSize" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <Spinner
+            android:id="@+id/sp_pool"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="25sp"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/bt_aniadir"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="25sp"
+            android:layout_weight="1"
+            android:text="@string/aniadir"
+            android:textSize="20sp"
+            tools:ignore="VisualLintButtonSize" />
+
+    </LinearLayout>
+</LinearLayout>

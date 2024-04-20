@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".SwissActivity">
+
+    <TextView
+        android:id="@+id/tv_ronda_actual"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:background="#B3421E" />
+
+    <LinearLayout
+        android:id="@+id/layoutCabecera"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:background="#000E5A"
+        android:orientation="horizontal"
+        tools:ignore="TextSizeCheck">
+
+        <TextView
+            android:id="@+id/tv_nom_cab"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/nombre"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/tv_alias_cab"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/alias"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/tv_punct_cab"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/punct"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/tv_wr_cab"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/w_r"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/tv_byes_cab"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/b"
+            android:textAlignment="center" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:contentDescription="@string/scroll">
+
+        <LinearLayout
+            android:id="@+id/layoutScroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TableLayout
+                android:id="@+id/tb_posiciones"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/bt_sig_r"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/next_round" />
+
+    <LinearLayout
+        android:id="@+id/layoutBtns"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:orientation="horizontal"
+        tools:ignore="UselessParent">
+
+        <Button
+            android:id="@+id/bt_enf_izda"
+            android:layout_width="375dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/flecha_izquierda"
+            android:contentDescription="@string/anterior"
+            tools:ignore="ButtonStyle" />
+
+        <Button
+            android:id="@+id/bt_enf_dcha"
+            android:layout_width="375dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/flecha_derecha"
+            android:contentDescription="@string/siguiente"
+            tools:ignore="ButtonStyle" />
+
+    </LinearLayout>
+</LinearLayout>
