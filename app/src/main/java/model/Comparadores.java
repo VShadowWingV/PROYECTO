@@ -4,7 +4,9 @@ import java.util.Comparator;
 
 public class Comparadores {
 
-    // Puntuación -> Win/Loss RT -> Win/Loss RT OP -> Menor Byes
+    /**
+     * ComparadorClasificacion: Comparador utilizado para ordenar participantes en función de su clasificación en el torneo.
+     */
     public static class ComparadorClasificacion implements Comparator<Participante_Tipo_SW> {
         private static final int PESO_PUNTUACION = 4;
         private static final int PESO_BYES = 3;
@@ -24,6 +26,9 @@ public class Comparadores {
         }
     }
 
+    /**
+     * ComparadorByeInverso: Comparador utilizado para ordenar participantes en función de los byes de manera inversa.
+     */
     public static class ComparadorByeInverso implements Comparator<Participante_Tipo_SW> {
         private static final int PESO_PUNTUACION = 4;
         private static final int PESO_BYES = -3;

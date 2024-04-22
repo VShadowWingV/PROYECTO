@@ -1,3 +1,6 @@
+/**
+ * Gestor_SW: Esta clase gestiona los participantes y la lógica de los torneos de tipo Swiss.
+ */
 package model;
 
 import android.util.Log;
@@ -15,19 +18,27 @@ public class Gestor_SW {
     private int partidas_set;
     private int jugadores_partida;
 
-    //SINGLETON
+    // SINGLETON
     private static Gestor_SW instancia;
 
     private Gestor_SW() {
         // Constructor privado para evitar instanciación externa
     }
 
+    /**
+     * getInstance: Método estático que devuelve la instancia única de Gestor_SW.
+     * @return instancia única de Gestor_SW.
+     */
     public static Gestor_SW getInstance() {
         if (instancia == null) {
             instancia = new Gestor_SW();
         }
         return instancia;
     }
+
+    // Métodos de acceso a los atributos
+
+    // Métodos de acceso y modificación de la lista de participantes
 
     public ArrayList<Participante_Tipo_SW> getLista_participantes() {
         return lista_participantes;
@@ -37,6 +48,8 @@ public class Gestor_SW {
         this.lista_participantes = lista_participantes;
     }
 
+    // Métodos de acceso y modificación de la cantidad de rondas
+
     public int getN_rondas() {
         return n_rondas;
     }
@@ -45,13 +58,17 @@ public class Gestor_SW {
         this.n_rondas = n_rondas;
     }
 
-    public int getJugadores_iniciales(){
-        return this.jugadores_iniciales;
+    // Métodos de acceso y modificación de la cantidad de jugadores iniciales
+
+    public int getJugadores_iniciales() {
+        return jugadores_iniciales;
     }
 
     public void setJugadores_iniciales(int jugadores_iniciales) {
         this.jugadores_iniciales = jugadores_iniciales;
     }
+
+    // Métodos de acceso y modificación de la ronda actual
 
     public int getRonda_actual() {
         return ronda_actual;
@@ -61,6 +78,8 @@ public class Gestor_SW {
         this.ronda_actual = ronda_actual;
     }
 
+    // Métodos de acceso y modificación del tipo de torneo (multijugador o no)
+
     public boolean es_multijugador() {
         return es_multijugador;
     }
@@ -68,6 +87,8 @@ public class Gestor_SW {
     public void setEs_multijugador(boolean es_multijugador) {
         this.es_multijugador = es_multijugador;
     }
+
+    // Métodos de acceso y modificación de la cantidad de partidas por set
 
     public int getPartidas_set() {
         return partidas_set;
@@ -77,6 +98,8 @@ public class Gestor_SW {
         this.partidas_set = partidas_set;
     }
 
+    // Métodos de acceso y modificación de la cantidad de jugadores por partida
+
     public int getJugadores_partida() {
         return jugadores_partida;
     }
@@ -85,10 +108,21 @@ public class Gestor_SW {
         this.jugadores_partida = jugadores_partida;
     }
 
+    // Otros métodos
+
+    /**
+     * aniadirParticipanteSW: Método para añadir un participante al torneo.
+     * @param participanteTipoRr Participante a añadir.
+     */
     public void aniadirParticipanteSW(Participante_Tipo_SW participanteTipoRr){
         this.lista_participantes.add(participanteTipoRr);
     }
 
+    /**
+     * getParticpanteListaID: Método para obtener un participante de la lista por su ID.
+     * @param id ID del participante a buscar.
+     * @return Participante_Tipo_SW si se encuentra, null en caso contrario.
+     */
     public Participante_Tipo_SW getParticpanteListaID(int id) {
         Participante_Tipo_SW participante_tipo_sw = null;
         for (Participante_Tipo_SW p: lista_participantes) {
@@ -99,6 +133,11 @@ public class Gestor_SW {
         return participante_tipo_sw;
     }
 
+    /**
+     * getParticpanteListaNombre: Método para obtener un participante de la lista por su nombre.
+     * @param nombre Nombre del participante a buscar.
+     * @return Participante_Tipo_SW si se encuentra, null en caso contrario.
+     */
     public Participante_Tipo_SW getParticpanteListaNombre(String nombre) {
         Participante_Tipo_SW participante_tipo_sw = null;
         for (Participante_Tipo_SW p: lista_participantes) {
@@ -109,21 +148,29 @@ public class Gestor_SW {
         return participante_tipo_sw;
     }
 
+    /**
+     * incRondaActual: Método para incrementar la ronda actual del torneo.
+     */
     public void incRondaActual(){
         this.ronda_actual++;
     }
 
+    /**
+     * devolverSublistaEnfrentamientoI: Método para obtener la sublista de participantes que se enfrentarán en la partida i.
+     * @param i Ronda del torneo.
+     * @return ArrayList de Participante_Tipo_SW con los participantes que se enfrentarán en la partida i.
+     */
     public ArrayList<Participante_Tipo_SW> devolverSublistaEnfrentamientoI(int i){
         ArrayList<Participante_Tipo_SW> listaEnfrentamientoI = new ArrayList<>();
         if (this.es_multijugador) {
-            // Si es multijugador cojo para cada enfrentamiento i su ordenación y el numero de jugadores por partida
+            // Si es multijugador, se obtiene la sublista según la cantidad de jugadores por partida
             if (i > 0 && i <= (jugadores_iniciales/jugadores_partida)) {
                 for (int j = (i-1)*jugadores_partida; j < ((i-1)*jugadores_partida + jugadores_partida); j++) {
                     listaEnfrentamientoI.add(lista_participantes.get(j));
                 }
             }
         } else {
-            // Si no es multijugador tengo que intentar que no se repitan los enfrentamientos usando la lista de oponentes
+            // Si no es multijugador, se gestionan los enfrentamientos para evitar repeticiones
             if (i > 0 && i <= (jugadores_iniciales/2)) {
                 ArrayList<Participante_Tipo_SW>[] vectorDeArrayListsEnf = new ArrayList[this.jugadores_iniciales/2];
                 HashSet<Participante_Tipo_SW> participantesConEnfrentamiento = new HashSet<>();
@@ -155,7 +202,7 @@ public class Gestor_SW {
                         vectorDeArrayListsEnf[j].add(p1);
                         vectorDeArrayListsEnf[j].add(p2);
                     } else if(e1 && !e2) {
-                        // Esto es para contemplar el caso de que no exista ningun participante sin enfrentamiento al que no te hayas enfrentado.
+                        // En caso de que no haya más participantes sin enfrentamiento, se añade uno aleatorio
                         vectorDeArrayListsEnf[j].add(p1);
                         boolean encontrado = false;
                         int n = 0;

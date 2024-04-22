@@ -65,7 +65,7 @@ public class PlayerActivity extends AppCompatActivity {
             sp_pool.setAdapter(adapter);
         }
 
-        // BOTÓN
+        // Botón
         bt_aniadir.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -87,6 +87,10 @@ public class PlayerActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * establecerPools: Crea un vector de pools para comprobar si todas las pools estan completas. Ejemplo: Si tenemos
+     * pool 1 y pool 2 con 8 participantes creara el siguiente vector [4][4] e irá restando segun vayas cumplimentado la pool.
+     */
     public void establecerPools(){
         for (int i = 1; i <= gestor_tc.getNum_pools(); i++) {
             lista_pools.add(i);
@@ -100,6 +104,10 @@ public class PlayerActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * guardarParticipanteFormato: Método para guardar un participante en el torneo según el formato seleccionado.
+     * @param formato_main El formato del torneo (Top Cut o Swiss).
+     */
     public void guardarParticipanteFormato(String formato_main) {
         switch (formato_main) {
             case "Top Cut":
@@ -112,7 +120,7 @@ public class PlayerActivity extends AppCompatActivity {
                         participantes_restantes[(int) sp_pool.getSelectedItem() - 1]--;
                         contParticipantes++;
 
-                        // VACIAR ET
+                        // Vaciar texto participante
                         et_nombre.setText("");
                         et_alias.setText("");
                     } else {
@@ -138,7 +146,7 @@ public class PlayerActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Participante añadido: " + (contParticipantes + 1), Toast.LENGTH_SHORT).show();
                     contParticipantes++;
 
-                    // VACIAR ET
+                    // Vaciar texto participante
                     et_nombre.setText("");
                     et_alias.setText("");
 

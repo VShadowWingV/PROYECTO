@@ -71,13 +71,13 @@ public class BFragmentFormatSel extends Fragment implements AdapterView.OnItemSe
         et_partidas_set = view.findViewById(R.id.num_partidos_set);
         cb_opc = view.findViewById(R.id.cb_opc);
 
-        // SPINNER
+        // Spinner
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, lista_formatos);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sp_formato.setAdapter(adapter);
         sp_formato.setOnItemSelectedListener(this);
 
-        // EDIT TEXT PARTICIPANTES
+        // EditText participantes
         et_participantes.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -105,7 +105,7 @@ public class BFragmentFormatSel extends Fragment implements AdapterView.OnItemSe
             }
         });
 
-        // CHECK BOX
+        // CheckBox
         cb_opc.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -123,7 +123,7 @@ public class BFragmentFormatSel extends Fragment implements AdapterView.OnItemSe
             }
         });
 
-        // BOTÓN
+        // Botón
         bt_ini.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -139,8 +139,6 @@ public class BFragmentFormatSel extends Fragment implements AdapterView.OnItemSe
                     gestor_tc.setPartidas_set(num_ps_jpe);
                     gestor_tc.setRonda_actual(1);
                     gestor_tc.setLoser_bracket(cb_opc.isChecked());
-                    // En TOP CUT siempre es 1vs1
-                    gestor_sw.setJugadores_partida(2);
 
                     gestor_sw.setEs_multijugador(cb_opc.isChecked());
                     gestor_sw.setN_rondas(num_rondas);
@@ -156,45 +154,8 @@ public class BFragmentFormatSel extends Fragment implements AdapterView.OnItemSe
                     }
 
                     if (FORMATO_SELECCIONADO.equals("Top Cut")) {
-                        // PROMPT PARA AÑADIR AL GESTOR TC las pools
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-
-                        View dialogView = inflater.inflate(R.layout.dialog_prompt_pools, null);
-                        builder.setView(dialogView);
-                        EditText editTextPrompt = dialogView.findViewById(R.id.et_pools);
-
-                        // En el método onClick del botón bt_ini
-                        builder.setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                String userInput = editTextPrompt.getText().toString();
-                                // NO EXISTE NINGUNA POTENCIA DE 2 DIVISIBLE ENTRE 3
-                                int dato_in = 3;
-
-                                try {
-                                    dato_in = Integer.parseInt(userInput);
-                                } catch (NumberFormatException e) {
-
-                                }
-
-                                if (num_participantes % dato_in == 0) {
-                                    avanzar = true;
-                                } else {
-                                    avanzar = false;
-                                    Toast.makeText(getContext(), "POOLS INCORRECTAS", Toast.LENGTH_SHORT).show();
-                                }
-
-                                if (avanzar) {
-                                    gestor_tc.setNum_pools(dato_in);
-                                    Intent intent = new Intent(getContext(), PlayerActivity.class);
-                                    startActivity(intent);
-                                }
-                            }
-                        });
-
-                        AlertDialog dialog = builder.create();
-                        dialog.show();
-
+                        // PROMPT para añador al gestor_tc las pools
+                        mostrarAlertPools(inflater);
                     } else {
                         Intent intent = new Intent(getContext(), PlayerActivity.class);
                         startActivity(intent);
@@ -225,6 +186,10 @@ public class BFragmentFormatSel extends Fragment implements AdapterView.OnItemSe
 
     }
 
+    /**
+     * comprobarEditText: Método para comprobar si los datos introducidos en los EditText son válidos.
+     * @return true si los datos son válidos, false de lo contrario.
+     */
     public boolean comprobarEditText(){
 
         boolean correctos = true;
@@ -285,7 +250,56 @@ public class BFragmentFormatSel extends Fragment implements AdapterView.OnItemSe
 
     }
 
+    /**
+     * getFORMATO_SELECCIONADO: Método para obtener el formato de torneo seleccionado.
+     * @return El formato de torneo seleccionado.
+     */
     public static String getFORMATO_SELECCIONADO(){
         return FORMATO_SELECCIONADO;
     }
+
+    /**
+     * mostrarAlertPools: Método para mostrar un cuadro de diálogo para ingresar el número de pools en el caso de Top Cut.
+     * @param inflater El inflador de diseño utilizado para inflar el diseño del cuadro de diálogo.
+     */
+    public void mostrarAlertPools(LayoutInflater inflater) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+        View dialogView = inflater.inflate(R.layout.dialog_prompt_pools, null);
+        builder.setView(dialogView);
+        EditText editTextPrompt = dialogView.findViewById(R.id.et_pools);
+
+        // En el método onClick del botón bt_ini
+        builder.setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String userInput = editTextPrompt.getText().toString();
+                // No existe ninguna potencia de 2 divisible entre 3
+                int dato_in = 3;
+
+                try {
+                    dato_in = Integer.parseInt(userInput);
+                } catch (NumberFormatException e) {
+
+                }
+
+                if (num_participantes % dato_in == 0) {
+                    avanzar = true;
+                } else {
+                    avanzar = false;
+                    Toast.makeText(getContext(), "POOLS INCORRECTAS", Toast.LENGTH_SHORT).show();
+                }
+
+                if (avanzar) {
+                    gestor_tc.setNum_pools(dato_in);
+                    Intent intent = new Intent(getContext(), PlayerActivity.class);
+                    startActivity(intent);
+                }
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+    
 }

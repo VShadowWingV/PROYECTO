@@ -1,5 +1,8 @@
 package model;
 
+/**
+ * MiStructParticipante: Esta clase define una estructura para representar la información de un participante en un torneo.
+ */
 public class MiStructParticipante {
 
     public int id;

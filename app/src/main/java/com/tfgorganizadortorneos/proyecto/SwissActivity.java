@@ -22,6 +22,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.tfgorganizadortorneos.proyecto.fragments.BFragmentInRes;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -138,13 +139,18 @@ public class SwissActivity extends AppCompatActivity {
                         gestor_sw.getLista_participantes().sort(new Comparadores.ComparadorClasificacion());
                         cargarElementosTabla(gestor_sw.getLista_participantes());
 
-                        generarArchivoJSONTorneoSuizo("TorneoSW");
+                        try {
+                            generarArchivoJSONTorneoSuizo("TorneoSW");
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
 
                     } else if(gestor_sw.getRonda_actual() <= gestor_sw.getN_rondas()) {
                         // SIGUIENTE RONDA
                         tv_ronda_actual.setText("RONDA: " + gestor_sw.getRonda_actual() + "/" + gestor_sw.getN_rondas());
                         gestor_sw.getLista_participantes().sort(new Comparadores.ComparadorClasificacion());
                         cargarElementosTabla(gestor_sw.getLista_participantes());
+                        gestor_sw.getLista_participantes().sort(new Comparadores.ComparadorByeInverso());
 
                         // REINCIAMOS VECTOR PARA GUARDAR NUEVOS DATOS Y CARGAMOS PRIMER ENFRENTAMIENTO
                         inicializarStructDatosGuardar();
@@ -296,9 +302,20 @@ public class SwissActivity extends AppCompatActivity {
      *
      * @param nombreDirectorio Nombre del directorio donde se guardará el archivo.
      */
-    public void generarArchivoJSONTorneoSuizo(String nombreDirectorio) {
+    public void generarArchivoJSONTorneoSuizo(String nombreDirectorio) throws JSONException {
         // JSON:
         JSONArray jsonArray = new JSONArray();
+        // Elementos del torneo:
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("n_rondas", gestor_sw.getN_rondas());
+        jsonObject.put("jugadores_iniciales", gestor_sw.getJugadores_iniciales());
+        jsonObject.put("ronda_actual", gestor_sw.getRonda_actual());
+        jsonObject.put("es_multijugador", gestor_sw.es_multijugador());
+        jsonObject.put("partidas_set", gestor_sw.getPartidas_set());
+        jsonObject.put("jugadores_partida", gestor_sw.getJugadores_partida());
+        jsonArray.put(jsonObject);
+
+        // Lista de participantes
         for (Participante_Tipo_SW participante : gestor_sw.getLista_participantes()) {
             JSONObject participanteJson = participante.toJson();
             jsonArray.put(participanteJson);
