@@ -4,19 +4,32 @@
 package model;
 
 import android.util.Log;
+import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.stream.JsonReader;
+
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Objects;
 
 public class Gestor_SW {
-    private ArrayList<Participante_Tipo_SW> lista_participantes = new ArrayList<>();
     private int n_rondas;
     private int jugadores_iniciales;
     private int ronda_actual;
     private boolean es_multijugador;
     private int partidas_set;
     private int jugadores_partida;
+    private ArrayList<Participante_Tipo_SW> lista_participantes = new ArrayList<>();
 
     // SINGLETON
     private static Gestor_SW instancia;
@@ -134,21 +147,6 @@ public class Gestor_SW {
     }
 
     /**
-     * getParticpanteListaNombre: Método para obtener un participante de la lista por su nombre.
-     * @param nombre Nombre del participante a buscar.
-     * @return Participante_Tipo_SW si se encuentra, null en caso contrario.
-     */
-    public Participante_Tipo_SW getParticpanteListaNombre(String nombre) {
-        Participante_Tipo_SW participante_tipo_sw = null;
-        for (Participante_Tipo_SW p: lista_participantes) {
-            if (p.getNombre().equals(nombre)) {
-                participante_tipo_sw = p;
-            }
-        }
-        return participante_tipo_sw;
-    }
-
-    /**
      * incRondaActual: Método para incrementar la ronda actual del torneo.
      */
     public void incRondaActual(){
@@ -222,6 +220,56 @@ public class Gestor_SW {
             }
         }
         return listaEnfrentamientoI;
+    }
+
+    /**
+     * Actualiza la instancia única del Gestor_SW con los datos deserializados desde un archivo JSON.
+     *
+     * Este método permite cargar los datos desde un archivo JSON en la instancia única existente del Gestor_SW.
+     * La instancia única se actualiza con los datos deserializados del archivo JSON proporcionado.
+     *
+     * @param archivoJson El archivo JSON del que se cargarán los datos.
+     * @throws JsonSyntaxException Si hay un error de sintaxis al analizar el JSON.
+     * @throws JsonIOException Si ocurre un error de E/S al leer el archivo JSON.
+     */
+    public synchronized void actualizarDesdeJson(File archivoJson) {
+        try {
+            Gson gson = new Gson();
+            Gestor_SW gestorAuxiliar = new Gestor_SW();
+            gestorAuxiliar = gson.fromJson(new JsonReader(new FileReader(archivoJson)),Gestor_SW.class);
+
+            this.setN_rondas(gestorAuxiliar.getN_rondas());
+            this.setJugadores_iniciales(gestorAuxiliar.getJugadores_iniciales());
+            this.setRonda_actual(gestorAuxiliar.getRonda_actual());
+            this.setEs_multijugador(gestorAuxiliar.es_multijugador);
+            this.setPartidas_set(gestorAuxiliar.getPartidas_set());
+            this.setJugadores_partida(gestorAuxiliar.getJugadores_partida());
+
+            for (Participante_Tipo_SW part: gestorAuxiliar.getLista_participantes()) {
+                Participante_Tipo_SW aniadir = new Participante_Tipo_SW(part.getId(), part.getNombre(), part.getAlias());
+                aniadir.setVictorias_totales(part.getVictorias_totales());
+                aniadir.setDerrotas_totales(part.getDerrotas_totales());
+                aniadir.setPuntuacion(part.getPuntuacion());
+                aniadir.setN_byes(part.getN_byes());
+
+                aniadir.setLista_oponentes(new ArrayList<>());
+                this.getLista_participantes().add(aniadir);
+            }
+
+            for (Participante_Tipo_SW part: this.getLista_participantes()) {
+                Participante_Tipo_SW flujo = gestorAuxiliar.getParticpanteListaID(part.getId());
+                if (!flujo.getLista_oponentes().isEmpty()) {
+                    for (Participante_Tipo_SW op: flujo.getLista_oponentes()) {
+                        part.addOponente(this.getParticpanteListaID(op.getId()));
+                    }
+                }
+            }
+
+        } catch (JsonSyntaxException | JsonIOException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

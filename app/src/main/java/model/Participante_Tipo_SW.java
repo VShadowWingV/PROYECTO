@@ -17,9 +17,9 @@ public class Participante_Tipo_SW extends Participante{
 
     @SerializedName("puntuacion")
     private int puntuacion;
-    @SerializedName("listaOponentes")
+    @SerializedName("lista_oponentes")
     private ArrayList<Participante_Tipo_SW> lista_oponentes;
-    @SerializedName("byes")
+    @SerializedName("n_byes")
     private int n_byes;
 
     /**
@@ -139,6 +139,8 @@ public class Participante_Tipo_SW extends Participante{
             jsonObject.put("id", getId());
             jsonObject.put("nombre", getNombre());
             jsonObject.put("alias", getAlias());
+            jsonObject.put("victorias_totales", getVictorias_totales());
+            jsonObject.put("derrotas_totales", getDerrotas_totales());
             jsonObject.put("puntuacion", puntuacion);
             jsonObject.put("n_byes", n_byes);
 
@@ -150,7 +152,7 @@ public class Participante_Tipo_SW extends Participante{
                 oponenteObject.put("alias", oponente.getAlias());
                 oponentesArray.put(oponenteObject);
             }
-            jsonObject.put("oponentes", oponentesArray);
+            jsonObject.put("lista_oponentes", oponentesArray);
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }

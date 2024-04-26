@@ -10,19 +10,22 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:contentDescription="@string/img_description"
-        android:src="@drawable/img_copa"
+        android:scaleX="1.5"
+        android:src="@drawable/img_inicio"
         tools:ignore="ImageContrastCheck" />
 
     <TextView
         android:id="@+id/tvNombreAPP"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingTop="150sp"
-        android:paddingEnd="10sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:background="#8D040404"
+        android:padding="10dp"
         android:text="@string/app_name"
-        android:textAlignment="viewEnd"
-        android:textColor="#AD1457"
-        android:textSize="50sp"
+        android:textAlignment="center"
+        android:textColor="#FFBF00"
+        android:textSize="30dp"
         tools:ignore="RtlSymmetry,TextContrastCheck" />
 
 </FrameLayout>

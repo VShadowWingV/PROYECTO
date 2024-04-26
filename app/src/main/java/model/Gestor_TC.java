@@ -85,6 +85,16 @@ public class Gestor_TC {
         this.lista_participantes.add(participanteTipoTc);
     }
 
+    public Participante_Tipo_TC getParticpanteListaAlias(String alias) {
+        Participante_Tipo_TC participante_tipo_tc = null;
+        for (Participante_Tipo_TC p: lista_participantes) {
+            if (p.getAlias().equals(alias)) {
+                participante_tipo_tc = p;
+            }
+        }
+        return participante_tipo_tc;
+    }
+
     public void incRondaActual(){
         this.ronda_actual++;
     }

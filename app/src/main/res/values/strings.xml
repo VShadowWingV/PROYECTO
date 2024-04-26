@@ -22,4 +22,6 @@
     <string name="generar_suizo">Generar Suizo</string>
     <string name="generar_top_cut">Generar Top Cut</string>
     <string name="fin_del_torneo">FIN DEL TORNEO</string>
+    <string name="img_br">img bracket</string>
+    <string name="r">R</string>
 </resources>

@@ -1,6 +1,8 @@
 package com.tfgorganizadortorneos.proyecto;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -44,11 +46,14 @@ public class PlayerActivity extends AppCompatActivity {
     int contParticipantes = 0;
     int [] participantes_restantes;
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_player);
+
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // Obtener elementos VIEW
         et_nombre = findViewById(R.id.et_nombre);
@@ -113,8 +118,7 @@ public class PlayerActivity extends AppCompatActivity {
             case "Top Cut":
                 if (contParticipantes < (gestor_tc.getJugadores_iniciales() - 1)) {
                     if (participantes_restantes[(int) sp_pool.getSelectedItem() - 1] > 0) {
-                        gestor_tc.aniadirParticipanteTC(new Participante_Tipo_TC(contParticipantes,et_nombre.getText().toString(),et_alias.getText().toString()));
-                        gestor_tc.getLista_participantes().get(contParticipantes).setPool((int) sp_pool.getSelectedItem());
+                        gestor_tc.aniadirParticipanteTC(new Participante_Tipo_TC(contParticipantes,et_nombre.getText().toString(),et_alias.getText().toString(),(int) sp_pool.getSelectedItem()));
                         Log.i("Participante añadido", gestor_tc.getLista_participantes().get(contParticipantes).toString());
                         Toast.makeText(getApplicationContext(), "Participante añadido: " + (contParticipantes + 1), Toast.LENGTH_SHORT).show();
                         participantes_restantes[(int) sp_pool.getSelectedItem() - 1]--;
@@ -127,8 +131,7 @@ public class PlayerActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "Pool completa, no valido", Toast.LENGTH_SHORT).show();
                     }
                 } else if (contParticipantes == (gestor_sw.getJugadores_iniciales() - 1)){
-                    gestor_tc.aniadirParticipanteTC(new Participante_Tipo_TC(contParticipantes,et_nombre.getText().toString(),et_alias.getText().toString()));
-                    gestor_tc.getLista_participantes().get(contParticipantes).setPool((int) sp_pool.getSelectedItem());
+                    gestor_tc.aniadirParticipanteTC(new Participante_Tipo_TC(contParticipantes,et_nombre.getText().toString(),et_alias.getText().toString(),(int) sp_pool.getSelectedItem()));
                     Log.i("Participante añadido", gestor_tc.getLista_participantes().get(contParticipantes).toString());
                     Toast.makeText(getApplicationContext(), "Participante añadido: " + (contParticipantes + 1), Toast.LENGTH_SHORT).show();
                     participantes_restantes[(int) sp_pool.getSelectedItem() - 1]--;

@@ -14,9 +14,9 @@ public class Participante {
     private String nombre;
     @SerializedName("alias")
     private String alias;
-    @SerializedName("victorias")
+    @SerializedName("victorias_totales")
     private int victorias_totales;
-    @SerializedName("derrotas")
+    @SerializedName("derrotas_totales")
     private int derrotas_totales;
 
     /**
