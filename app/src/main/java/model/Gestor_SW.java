@@ -3,6 +3,7 @@
  */
 package model;
 
+import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -11,12 +12,15 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -223,6 +227,63 @@ public class Gestor_SW {
     }
 
     /**
+     * Genera un archivo JSON para el torneo suizo.
+     *
+     * @param nombreDirectorio Nombre del directorio donde se guardará el archivo.
+     * @param nombreArchivo Nombre del archivo en el que se guarda la info del torneo.
+     * @param context Contexto de la app para saber ruta de los archivos
+     */
+    public void generarArchivoJSONTorneoSuizo(String nombreDirectorio, String nombreArchivo, Context context) throws JSONException {
+        // JSON:
+        // Elementos del torneo:
+        JSONObject jsonObjectG = new JSONObject();
+        jsonObjectG.put("n_rondas", instancia.getN_rondas());
+        jsonObjectG.put("jugadores_iniciales", instancia.getJugadores_iniciales());
+        if (instancia.getRonda_actual() > instancia.getN_rondas()) {
+            jsonObjectG.put("ronda_actual", instancia.getN_rondas());
+        } else {
+            jsonObjectG.put("ronda_actual", instancia.getRonda_actual());
+        }
+        jsonObjectG.put("es_multijugador", instancia.es_multijugador());
+        jsonObjectG.put("partidas_set", instancia.getPartidas_set());
+        jsonObjectG.put("jugadores_partida", instancia.getJugadores_partida());
+
+        JSONArray jsonArrayPart = new JSONArray();
+        // Lista de participantes
+        for (Participante_Tipo_SW participante : instancia.getLista_participantes()) {
+            JSONObject participanteJson = participante.toJson();
+            jsonArrayPart.put(participanteJson);
+        }
+        jsonObjectG.put("lista_participantes",jsonArrayPart);
+
+        String json_res = jsonObjectG.toString();
+
+        String fileName = "torneo_sw_" + nombreArchivo + ".json";
+        File directory = new File(context.getExternalFilesDir(null), nombreDirectorio);
+
+        // E/S Ficheros
+        if (!directory.exists()) {
+            if (directory.mkdirs()) {
+                Toast.makeText(context, "Creando el directorio: " + directory.getAbsolutePath(), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(context, "Error al crear el directorio: " + directory.getAbsolutePath(), Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        File file = new File(directory, fileName);
+        try {
+            // Escribir en el archivo JSON
+            FileWriter fileWriter = new FileWriter(file);
+            fileWriter.write(json_res);
+            fileWriter.flush();
+            fileWriter.close();
+
+        } catch (IOException e) {
+            Toast.makeText(context, "Error al crear el archivo JSON", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
      * Actualiza la instancia única del Gestor_SW con los datos deserializados desde un archivo JSON.
      *
      * Este método permite cargar los datos desde un archivo JSON en la instancia única existente del Gestor_SW.
@@ -274,6 +335,6 @@ public class Gestor_SW {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getLista_participantes(), getN_rondas(), getJugadores_iniciales(), getRonda_actual(), es_multijugador, getPartidas_set(), getJugadores_partida());
+        return Objects.hash(getLista_participantes(), getN_rondas(), getJugadores_iniciales(), getRonda_actual(), es_multijugador(), getPartidas_set(), getJugadores_partida());
     }
 }

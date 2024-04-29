@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -24,6 +25,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
@@ -39,6 +47,7 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
     Button bt_sig;
     TextView tv_j1;
     TextView tv_j2;
+    TextView tv_rondas;
     EditText et_res_j1;
     EditText et_res_j2;
     LinearLayout layoutBracket;
@@ -62,6 +71,7 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
         bt_sig = findViewById(R.id.bt_sig);
         tv_j1 = findViewById(R.id.tv_jug1);
         tv_j2 = findViewById(R.id.tv_jug2);
+        tv_rondas = findViewById(R.id.tv_rondas);
         et_res_j1 = findViewById(R.id.et_res_jug1);
         et_res_j2 = findViewById(R.id.et_res_jug2);
         layoutBracket = findViewById(R.id.layoutBracket);
@@ -72,10 +82,22 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
         layoutBracket.getLocationOnScreen(posicionLayout);
         limitePantallaBracket = posicionLayout[1] + layoutBracket.getLayoutParams().height;
 
-        // Prueba
-        generarDatosPruebaTopCut();
+        // Inicialización de valores con archivo tmp
+        String fileNameS = "torneo_tc_tmp.json";
+        File directoryS = new File(getApplicationContext().getExternalFilesDir(null), "TorneoTC");
+        File temporalTopCut = new File(directoryS, fileNameS);
+        try {
+            if(temporalTopCut.exists()) {
+                gestor_tc.actualizarDesdeJson(temporalTopCut);
+            } else {
+                gestor_tc.generarArchivoJSONTorneoTopCut("TorneoTC", "tmp", getApplicationContext());
+            }
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
 
-        // Generar TV participantes
+        // Generar TV participantes y rondas
+        tv_rondas.setText("Ronda: "  + String.valueOf(gestor_tc.getRonda_actual()) + "/" + String.valueOf(gestor_tc.getN_rondas()));
         cargarParticipantesTextView(layoutJugadores);
 
         // Boton
@@ -89,8 +111,72 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
 
                 if (j1 != null && j2 != null) {
                     if (comprobarEditText()) {
-                        // Guardar datos gestor
-                        Toast.makeText(getApplicationContext(), j1.getNombre() + " vs " + j2.getNombre(), Toast.LENGTH_SHORT).show();
+                        // Comprobaciones de datos y actualizaciones, si es lb tengo que comprobar que este eliminado a 2
+                        if(gestor_tc.isLoser_bracket()) {
+                            if (j1.getEliminado() == 2 || j2.getEliminado() == 2) {
+                                Toast.makeText(getApplicationContext(), "Uno de los jugadores ya está eliminado del TOP, inválido", Toast.LENGTH_SHORT).show();
+                            } else if(j1.getEliminado() != j2.getEliminado() && (gestor_tc.getN_rondas() != gestor_tc.getRonda_actual())){
+                                Toast.makeText(getApplicationContext(), "Los jugadores están en diferentes lados del BRACKET y no es la FINAL, inválido", Toast.LENGTH_SHORT).show();
+                            } else if (j1.getPool() == j2.getPool() && gestor_tc.getRonda_actual() == 1) {
+                                Toast.makeText(getApplicationContext(), "Los jugadores son del mismo POOL y es la ronda 1, inválido", Toast.LENGTH_SHORT).show();
+                            } else {
+                                // Datos para procesar en el gestor -> Participantes
+                                if (Integer.parseInt(et_res_j1.getText().toString()) < Integer.parseInt(et_res_j2.getText().toString())) {
+                                    j1.incEliminado();
+                                } else {
+                                    j2.incEliminado();
+                                }
+                                j1.incVictorias(Integer.parseInt(et_res_j1.getText().toString()));
+                                j2.incVictorias(Integer.parseInt(et_res_j2.getText().toString()));
+                                j1.incDerrotas(Integer.parseInt(et_res_j2.getText().toString()));
+                                j2.incDerrotas(Integer.parseInt(et_res_j1.getText().toString()));
+
+                                // Datos para procesar en el gesot -> Enfrentamiento
+                                Toast.makeText(getApplicationContext(), j1.getNombre() + " vs " + j2.getNombre(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "Añadiendo enfrentamiento nº " + String.valueOf(gestor_tc.getEnfrentamientosRegistrados().size() + 1), Toast.LENGTH_SHORT).show();
+                                gestor_tc.aniadirEnfrentamientoRegistrado(j1.getNombre(),j2.getNombre(),
+                                        et_res_j1.getText().toString() + " - " + et_res_j2.getText().toString());
+                            }
+                        } else {
+                            if (j1.getEliminado() == 1 || j2.getEliminado() == 1) {
+                                Toast.makeText(getApplicationContext(), "Uno de los jugadores ya está eliminado del TOP, inválido", Toast.LENGTH_SHORT).show();
+                            } else if (j1.getPool() == j2.getPool() && gestor_tc.getRonda_actual() == 1) {
+                                Toast.makeText(getApplicationContext(), "Los jugadores son del mismo POOL y es la ronda 1, inválido", Toast.LENGTH_SHORT).show();
+                            } else {
+                                // Datos para procesar en el gestor -> Participantes
+                                if (Integer.parseInt(et_res_j1.getText().toString()) < Integer.parseInt(et_res_j2.getText().toString())) {
+                                    j1.incEliminado();
+                                } else {
+                                    j2.incEliminado();
+                                }
+                                j1.incVictorias(Integer.parseInt(et_res_j1.getText().toString()));
+                                j2.incVictorias(Integer.parseInt(et_res_j2.getText().toString()));
+                                j1.incDerrotas(Integer.parseInt(et_res_j2.getText().toString()));
+                                j2.incDerrotas(Integer.parseInt(et_res_j1.getText().toString()));
+
+                                // Datos para procesar en el gesot -> Enfrentamiento
+                                Toast.makeText(getApplicationContext(), j1.getNombre() + " vs " + j2.getNombre(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "Añadiendo enfrentamiento nº " + String.valueOf(gestor_tc.getEnfrentamientosRegistrados().size()), Toast.LENGTH_SHORT).show();
+                                gestor_tc.aniadirEnfrentamientoRegistrado(j1.getNombre(),j2.getNombre(),
+                                        et_res_j1.getText().toString() + " - " + et_res_j2.getText().toString());
+                            }
+                        }
+
+                        if (calcularRondaEnfrentamientos(gestor_tc.getRonda_actual()) == gestor_tc.getEnfrentamientosRegistrados().size()) {
+                            gestor_tc.incRondaActual();
+                            restablecerParticipantesTextView();
+                            if (gestor_tc.getRonda_actual() <= gestor_tc.getN_rondas()) {
+                                tv_rondas.setText("Ronda: "  + String.valueOf(gestor_tc.getRonda_actual()) + "/" + String.valueOf(gestor_tc.getN_rondas()));
+                                try {
+                                    borrarArchivoJsonTemporal("TorneoTC");
+                                    gestor_tc.generarArchivoJSONTorneoTopCut("TorneoTC", "tmp", getApplicationContext());
+                                } catch (JSONException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Fin del torneo, generando resultados...", Toast.LENGTH_SHORT).show();
+                            }
+                        }
 
                         et_res_j1.setText("");
                         et_res_j2.setText("");
@@ -167,7 +253,7 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
         gestor_tc.setPartidas_set(5);
         gestor_tc.setJugadores_iniciales(gestor_tc.getLista_participantes().size());
         gestor_tc.setNum_pools(4);
-        gestor_tc.setLoser_bracket(true);
+        gestor_tc.setLoser_bracket(false);
 
     }
 
@@ -210,6 +296,11 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < gestor_tc.getJugadores_iniciales() / 4; j++) {
                 TextView tv_part = lista_tv_jugadores.get(i + j * 4);
+                if (gestor_tc.getLista_participantes().get(i + j * 4).getEliminado() == 2 && gestor_tc.isLoser_bracket()) {
+                    //tv_part.setBackgroundColor();
+                } else if (gestor_tc.getLista_participantes().get(i + j * 4).getEliminado() == 1) {
+                    //tv_part.setBackgroundColor();
+                }
                 tv_part.setTranslationX(i * (anchoTv + margen) + margen);
                 tv_part.setTranslationY(j * (largoTv + margen) + margen + limitePantallaBracket);
             }
@@ -228,6 +319,21 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
         }
 
         return num_jugadores;
+    }
+
+    public void borrarArchivoJsonTemporal(String nombreDirectorio) {
+        String fileName = "torneo_sw_tmp.json";
+        File directory = new File(getApplicationContext().getExternalFilesDir(null), nombreDirectorio);
+        File file = null;
+        if (directory.exists()) {
+            file = new File(directory, fileName);
+        }
+
+        if (file != null) {
+            if(file.delete()){
+                Log.i("TMP","Archivo borrado");
+            }
+        }
     }
 
     public Participante_Tipo_TC devolverJugadorJ1TextView() {
@@ -290,6 +396,27 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
             correctos = false;
         }
         return correctos;
+    }
+
+    public int calcularRondaEnfrentamientos(int ronda) {
+        int enfrentamientosR;
+        // Siguiendo la siguiente progresion de enfrentamientos: jug/2 -> jug/4 -> jug/8 ...  Se que tengo que registrar 4 -> 6 -> 7
+        // enfrentamientos para ir avanzando las rondas. De esa forma solo necesito el numero de enfrentamientos guardados para saber
+        // en que ronda estamos y avanzar en consecuencia. En lb es igual pero con la secuencia 6 -> 9 -> 10 o lo que es lo mismo, sumar
+        // tambien el anterior numero de la sucesion.
+        if (gestor_tc.isLoser_bracket()) {
+            enfrentamientosR = gestor_tc.getJugadores_iniciales()/2 + gestor_tc.getJugadores_iniciales()/4;
+        } else {
+            enfrentamientosR = gestor_tc.getJugadores_iniciales()/2;
+        }
+        for (int i = 2; i <= ronda; i++) {
+            if (gestor_tc.isLoser_bracket()) {
+                enfrentamientosR = enfrentamientosR + (int) (gestor_tc.getJugadores_iniciales()/Math.pow(2,i)) + (int) (gestor_tc.getJugadores_iniciales()/Math.pow(2,i+1));
+            } else {
+                enfrentamientosR += (int) (gestor_tc.getJugadores_iniciales()/Math.pow(2,i));
+            }
+        }
+        return enfrentamientosR;
     }
 
     public static int generarColorAleatorio(Set<Integer> usedColors) {

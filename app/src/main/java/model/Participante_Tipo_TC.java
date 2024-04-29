@@ -1,5 +1,9 @@
 package model;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class Participante_Tipo_TC extends Participante{
 
     private int pool;
@@ -21,5 +25,32 @@ public class Participante_Tipo_TC extends Participante{
         this.pool = pool;
     }
 
+    public int getEliminado() {
+        return eliminado;
+    }
+
+    public void setEliminado(int eliminado) {
+        this.eliminado = eliminado;
+    }
+
+    public void incEliminado() {
+        this.eliminado++;
+    }
+
+    public JSONObject toJson() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("id", getId());
+            jsonObject.put("nombre", getNombre());
+            jsonObject.put("alias", getAlias());
+            jsonObject.put("victorias_totales", getVictorias_totales());
+            jsonObject.put("derrotas_totales", getDerrotas_totales());
+            jsonObject.put("pool", getPool());
+            jsonObject.put("eliminado", getEliminado());
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        return jsonObject;
+    }
 
 }

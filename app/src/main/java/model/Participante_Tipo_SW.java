@@ -141,8 +141,8 @@ public class Participante_Tipo_SW extends Participante{
             jsonObject.put("alias", getAlias());
             jsonObject.put("victorias_totales", getVictorias_totales());
             jsonObject.put("derrotas_totales", getDerrotas_totales());
-            jsonObject.put("puntuacion", puntuacion);
-            jsonObject.put("n_byes", n_byes);
+            jsonObject.put("puntuacion", getPuntuacion());
+            jsonObject.put("n_byes", getN_byes());
 
             JSONArray oponentesArray = new JSONArray();
             for (Participante_Tipo_SW oponente : lista_oponentes) {

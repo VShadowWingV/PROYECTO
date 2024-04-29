@@ -86,16 +86,15 @@ public class SwissActivity extends AppCompatActivity {
         LinearLayout mainLayout = findViewById(R.id.main);
         mainLayout.addView(fragmentContainerView);
 
+        // Inicializar STRUCTS, ronda inicial y archivo temporal por si es necesario para recuperar
         String fileNameS = "torneo_sw_tmp.json";
         File directoryS = new File(getApplicationContext().getExternalFilesDir(null), "TorneoSW");
         File temporalSuizo = new File(directoryS, fileNameS);
-
-        // Inicializar STRUCTS, ronda inicial y archivo temporal por si es necesario para recuperar
         try {
             if(temporalSuizo.exists()) {
                 gestor_sw.actualizarDesdeJson(temporalSuizo);
             } else {
-                generarArchivoJSONTorneoSuizo("TorneoSW", "tmp");
+                gestor_sw.generarArchivoJSONTorneoSuizo("TorneoSW", "tmp", getApplicationContext());
             }
         } catch (JSONException e) {
             throw new RuntimeException(e);
@@ -165,7 +164,7 @@ public class SwissActivity extends AppCompatActivity {
                         cargarElementosTabla(gestor_sw.getLista_participantes());
 
                         try {
-                            generarArchivoJSONTorneoSuizo("TorneoSW",String.valueOf(Math.abs(gestor_sw.hashCode())));
+                            gestor_sw.generarArchivoJSONTorneoSuizo("TorneoSW",String.valueOf(Math.abs(gestor_sw.hashCode())), getApplicationContext());
                             borrarArchivoJsonTemporal("TorneoSW");
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
@@ -179,7 +178,7 @@ public class SwissActivity extends AppCompatActivity {
                         gestor_sw.getLista_participantes().sort(new Comparadores.ComparadorByeInverso());
                         try {
                             borrarArchivoJsonTemporal("TorneoSW");
-                            generarArchivoJSONTorneoSuizo("TorneoSW", "tmp");
+                            gestor_sw.generarArchivoJSONTorneoSuizo("TorneoSW", "tmp", getApplicationContext());
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }
@@ -332,62 +331,6 @@ public class SwissActivity extends AppCompatActivity {
         gestor_sw.setJugadores_partida(2);
         gestor_sw.setN_rondas(4);
         gestor_sw.setRonda_actual(4);
-    }
-
-    /**
-     * Genera un archivo JSON para el torneo suizo.
-     *
-     * @param nombreDirectorio Nombre del directorio donde se guardará el archivo.
-     * @param nombreArchivo Nombre del archivo en el que se guarda la info del torneo.
-     */
-    public void generarArchivoJSONTorneoSuizo(String nombreDirectorio, String nombreArchivo) throws JSONException {
-        // JSON:
-        // Elementos del torneo:
-        JSONObject jsonObjectG = new JSONObject();
-        jsonObjectG.put("n_rondas", gestor_sw.getN_rondas());
-        jsonObjectG.put("jugadores_iniciales", gestor_sw.getJugadores_iniciales());
-        if (gestor_sw.getRonda_actual() > gestor_sw.getN_rondas()) {
-            jsonObjectG.put("ronda_actual", gestor_sw.getN_rondas());
-        } else {
-            jsonObjectG.put("ronda_actual", gestor_sw.getRonda_actual());
-        }
-        jsonObjectG.put("es_multijugador", gestor_sw.es_multijugador());
-        jsonObjectG.put("partidas_set", gestor_sw.getPartidas_set());
-        jsonObjectG.put("jugadores_partida", gestor_sw.getJugadores_partida());
-
-        JSONArray jsonArrayPart = new JSONArray();
-        // Lista de participantes
-        for (Participante_Tipo_SW participante : gestor_sw.getLista_participantes()) {
-            JSONObject participanteJson = participante.toJson();
-            jsonArrayPart.put(participanteJson);
-        }
-        jsonObjectG.put("lista_participantes",jsonArrayPart);
-
-        String json_res = jsonObjectG.toString();
-
-        String fileName = "torneo_sw_" + nombreArchivo + ".json";
-        File directory = new File(getApplicationContext().getExternalFilesDir(null), nombreDirectorio);
-
-        // E/S Ficheros
-        if (!directory.exists()) {
-            if (directory.mkdirs()) {
-                Toast.makeText(getApplicationContext(), "Creando el directorio: " + directory.getAbsolutePath(), Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getApplicationContext(), "Error al crear el directorio: " + directory.getAbsolutePath(), Toast.LENGTH_SHORT).show();
-            }
-        }
-
-        File file = new File(directory, fileName);
-        try {
-            // Escribir en el archivo JSON
-            FileWriter fileWriter = new FileWriter(file);
-            fileWriter.write(json_res);
-            fileWriter.flush();
-            fileWriter.close();
-
-        } catch (IOException e) {
-            Toast.makeText(getApplicationContext(), "Error al crear el archivo JSON", Toast.LENGTH_SHORT).show();
-        }
     }
 
     /**

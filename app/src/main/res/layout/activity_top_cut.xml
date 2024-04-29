@@ -31,6 +31,15 @@
             android:orientation="vertical"
             tools:ignore="NestedWeights">
 
+            <TextView
+                android:id="@+id/tv_rondas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#FF3D00"
+                android:gravity="center"
+                android:text="@string/r"
+                android:textColor="#212121" />
+
             <LinearLayout
                 android:id="@+id/layoutJ1"
                 android:layout_width="match_parent"
@@ -131,7 +140,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
-            android:text="@string/siguiente" />
+            android:text="@string/siguiente"
+            android:translationY="10dp" />
 
     </LinearLayout>
 

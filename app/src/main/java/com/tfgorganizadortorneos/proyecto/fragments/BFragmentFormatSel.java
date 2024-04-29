@@ -94,11 +94,7 @@ public class BFragmentFormatSel extends Fragment implements AdapterView.OnItemSe
                 try {
                     num_participantes = Integer.parseInt(et_participantes.getText().toString());
                     int rondas = (int) (Math.log(num_participantes) / Math.log(2));
-                    if (FORMATO_SELECCIONADO.equals("Top Cut") && cb_opc.isChecked()){
-                        et_rondas.setText(String.valueOf(rondas*2));
-                    } else if(FORMATO_SELECCIONADO.equals("Top Cut") && !cb_opc.isChecked()){
-                        et_rondas.setText(String.valueOf(rondas));
-                    }
+                    et_rondas.setText(String.valueOf(rondas));
                 } catch (NumberFormatException e) {
                     Log.e("ERROR","Error al convertir la cadena en un número entero: " + e.getMessage());
                 }
@@ -112,11 +108,7 @@ public class BFragmentFormatSel extends Fragment implements AdapterView.OnItemSe
                 try {
                     num_participantes = Integer.parseInt(et_participantes.getText().toString());
                     int rondas = (int) (Math.log(num_participantes) / Math.log(2));
-                    if (FORMATO_SELECCIONADO.equals("Top Cut") && cb_opc.isChecked()){
-                        et_rondas.setText(String.valueOf(rondas*2));
-                    } else if(FORMATO_SELECCIONADO.equals("Top Cut") && !cb_opc.isChecked()){
-                        et_rondas.setText(String.valueOf(rondas));
-                    }
+                    et_rondas.setText(String.valueOf(rondas));
                 } catch (NumberFormatException e) {
                     Log.e("ERROR","Error al convertir la cadena en un número entero: " + e.getMessage());
                 }
@@ -134,7 +126,8 @@ public class BFragmentFormatSel extends Fragment implements AdapterView.OnItemSe
                     Log.i("DATOS",String.valueOf(num_ps_jpe));
 
                     // Añadiendo la informacion a la instancia singleton de los gestores;
-                    gestor_tc.setN_rondas(num_rondas);
+                    int rondas = (int) (Math.log(num_participantes) / Math.log(2));
+                    gestor_tc.setN_rondas(rondas);
                     gestor_tc.setJugadores_iniciales(num_participantes);
                     gestor_tc.setPartidas_set(num_ps_jpe);
                     gestor_tc.setRonda_actual(1);
