@@ -333,9 +333,9 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
                     tv_part.setTextColor(Color.WHITE);
                     tv_part.setBackgroundColor(Color.RED);
                 } else if(gestor_tc.getLista_participantes().get(i*4 + j).getEliminado() == 1 && gestor_tc.isLoser_bracket()) {
-                    // Azul y Blanco para loser bracket
+                    // Verde y Blanco para loser bracket
                     tv_part.setTextColor(Color.WHITE);
-                    tv_part.setBackgroundColor(Color.BLUE);
+                    tv_part.setBackgroundColor(Color.GREEN);
                 }
                 tv_part.setTranslationX(j * (anchoTv + margen) + margen);
                 tv_part.setTranslationY(i * (largoTv + margen) + margen + limitePantallaBracket);
