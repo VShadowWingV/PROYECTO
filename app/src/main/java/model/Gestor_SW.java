@@ -27,13 +27,13 @@ import java.util.HashSet;
 import java.util.Objects;
 
 public class Gestor_SW {
+    private ArrayList<Participante_Tipo_SW> lista_participantes = new ArrayList<>();
     private int n_rondas;
     private int jugadores_iniciales;
     private int ronda_actual;
     private boolean es_multijugador;
     private int partidas_set;
     private int jugadores_partida;
-    private ArrayList<Participante_Tipo_SW> lista_participantes = new ArrayList<>();
 
     // SINGLETON
     private static Gestor_SW instancia;
@@ -159,7 +159,7 @@ public class Gestor_SW {
 
     /**
      * devolverSublistaEnfrentamientoI: Método para obtener la sublista de participantes que se enfrentarán en la partida i.
-     * @param i Ronda del torneo.
+     * @param i Enfrentamiento posicional.
      * @return ArrayList de Participante_Tipo_SW con los participantes que se enfrentarán en la partida i.
      */
     public ArrayList<Participante_Tipo_SW> devolverSublistaEnfrentamientoI(int i){
