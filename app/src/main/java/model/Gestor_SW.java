@@ -129,10 +129,10 @@ public class Gestor_SW {
 
     /**
      * aniadirParticipanteSW: Método para añadir un participante al torneo.
-     * @param participanteTipoRr Participante a añadir.
+     * @param participanteTipoSw Participante a añadir.
      */
-    public void aniadirParticipanteSW(Participante_Tipo_SW participanteTipoRr){
-        this.lista_participantes.add(participanteTipoRr);
+    public void aniadirParticipanteSW(Participante_Tipo_SW participanteTipoSw){
+        this.lista_participantes.add(participanteTipoSw);
     }
 
     /**
@@ -333,6 +333,13 @@ public class Gestor_SW {
         }
     }
 
+    /**
+     * Genera un valor hash único basado en el estado del objeto.
+     * Este valor se utiliza para indexar y organizar objetos en estructuras de datos como tablas hash.
+     * La combinación de varios atributos del objeto garantiza la unicidad del valor hash.
+     *
+     * @return El valor hash generado para el objeto.
+     */
     @Override
     public int hashCode() {
         return Objects.hash(getLista_participantes(), getN_rondas(), getJugadores_iniciales(), getRonda_actual(), es_multijugador(), getPartidas_set(), getJugadores_partida());

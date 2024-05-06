@@ -8,11 +8,9 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,20 +23,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
 import model.Gestor_TC;
-import model.Participante_Tipo_SW;
 import model.Participante_Tipo_TC;
 
 public class TopCutActivity extends AppCompatActivity implements View.OnTouchListener {
@@ -58,6 +51,7 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
     Gestor_TC gestor_tc = Gestor_TC.getInstance();
     float previousX, previousY;
     float limitePantallaBracket;
+    boolean esFinal = false;
 
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
@@ -79,6 +73,7 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
 
         // Datos con las vistas para hacer cálculos de inicialización
         int[] posicionLayout = new int[2];
+        esFinal = false;
         layoutBracket.getLocationOnScreen(posicionLayout);
         limitePantallaBracket = posicionLayout[1] + layoutBracket.getLayoutParams().height;
 
@@ -115,10 +110,10 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
                         if(gestor_tc.isLoser_bracket()) {
                             if (j1.getEliminado() == 2 || j2.getEliminado() == 2) {
                                 Toast.makeText(getApplicationContext(), "Uno de los jugadores ya está eliminado del TOP, inválido", Toast.LENGTH_SHORT).show();
-                            } else if(j1.getEliminado() != j2.getEliminado() && (gestor_tc.getN_rondas() != gestor_tc.getRonda_actual())){
+                            } else if(j1.getEliminado() != j2.getEliminado() && !calcularFinalReal()){
                                 Toast.makeText(getApplicationContext(), "Los jugadores están en diferentes lados del BRACKET y no es la FINAL, inválido", Toast.LENGTH_SHORT).show();
-                            } else if (j1.getPool() == j2.getPool() && gestor_tc.getRonda_actual() == 1) {
-                                Toast.makeText(getApplicationContext(), "Los jugadores son del mismo POOL y es la ronda 1, inválido", Toast.LENGTH_SHORT).show();
+                            } else if (j1.getPool() == j2.getPool() && gestor_tc.getEnfrentamientos_registrados().size() < gestor_tc.getJugadores_iniciales()/2) {
+                                Toast.makeText(getApplicationContext(), "Los jugadores son del mismo POOL y es la ronda 1 de winners, inválido", Toast.LENGTH_SHORT).show();
                             } else {
                                 // Datos para procesar en el gestor -> Participantes
                                 if (Integer.parseInt(et_res_j1.getText().toString()) < Integer.parseInt(et_res_j2.getText().toString())) {
@@ -133,15 +128,29 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
 
                                 // Datos para procesar en el gesot -> Enfrentamiento
                                 Toast.makeText(getApplicationContext(), j1.getNombre() + " vs " + j2.getNombre(), Toast.LENGTH_SHORT).show();
-                                Toast.makeText(getApplicationContext(), "Añadiendo enfrentamiento nº " + String.valueOf(gestor_tc.getEnfrentamientosRegistrados().size() + 1), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "Añadiendo enfrentamiento nº " + String.valueOf(gestor_tc.getEnfrentamientos_registrados().size() + 1), Toast.LENGTH_SHORT).show();
                                 gestor_tc.aniadirEnfrentamientoRegistrado(j1.getNombre(),j2.getNombre(),
                                         et_res_j1.getText().toString() + " - " + et_res_j2.getText().toString());
+
+                                // Si es la final real (nos quedan solo dos participantes sin eliminar) el siguiente enfrentamiento que añadamos
+                                // finalizará el torneo
+                                if (calcularFinalReal()) {
+                                    esFinal = true;
+                                } else if (esFinal) {
+                                    Toast.makeText(getApplicationContext(),"Finalizando torneo, generando resultados..." , Toast.LENGTH_SHORT).show();
+                                    try {
+                                        gestor_tc.generarArchivoJSONTorneoTopCut("TorneoTC",String.valueOf(Math.abs(gestor_tc.hashCode())), getApplicationContext());
+                                        borrarArchivoJsonTemporal("TorneoTC");
+                                    } catch (JSONException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                }
                             }
                         } else {
                             if (j1.getEliminado() == 1 || j2.getEliminado() == 1) {
                                 Toast.makeText(getApplicationContext(), "Uno de los jugadores ya está eliminado del TOP, inválido", Toast.LENGTH_SHORT).show();
-                            } else if (j1.getPool() == j2.getPool() && gestor_tc.getRonda_actual() == 1) {
-                                Toast.makeText(getApplicationContext(), "Los jugadores son del mismo POOL y es la ronda 1, inválido", Toast.LENGTH_SHORT).show();
+                            } else if (j1.getPool() == j2.getPool() && gestor_tc.getEnfrentamientos_registrados().size() < gestor_tc.getJugadores_iniciales()/2) {
+                                Toast.makeText(getApplicationContext(), "Los jugadores son del mismo POOL y es la ronda 1 de winners, inválido", Toast.LENGTH_SHORT).show();
                             } else {
                                 // Datos para procesar en el gestor -> Participantes
                                 if (Integer.parseInt(et_res_j1.getText().toString()) < Integer.parseInt(et_res_j2.getText().toString())) {
@@ -156,13 +165,21 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
 
                                 // Datos para procesar en el gesot -> Enfrentamiento
                                 Toast.makeText(getApplicationContext(), j1.getNombre() + " vs " + j2.getNombre(), Toast.LENGTH_SHORT).show();
-                                Toast.makeText(getApplicationContext(), "Añadiendo enfrentamiento nº " + String.valueOf(gestor_tc.getEnfrentamientosRegistrados().size()), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "Añadiendo enfrentamiento nº " + String.valueOf(gestor_tc.getEnfrentamientos_registrados().size() + 1), Toast.LENGTH_SHORT).show();
                                 gestor_tc.aniadirEnfrentamientoRegistrado(j1.getNombre(),j2.getNombre(),
                                         et_res_j1.getText().toString() + " - " + et_res_j2.getText().toString());
+
+                                // Si es la final real (nos quedan solo dos participantes sin eliminar) el siguiente enfrentamiento que añadamos
+                                // finalizará el torneo
+                                if (calcularFinalReal()) {
+                                    esFinal = true;
+                                } else if (esFinal) {
+                                    Toast.makeText(getApplicationContext(),"Finalizando torneo, generando resultados..." , Toast.LENGTH_SHORT).show();
+                                }
                             }
                         }
 
-                        if (calcularRondaEnfrentamientos(gestor_tc.getRonda_actual()) == gestor_tc.getEnfrentamientosRegistrados().size()) {
+                        if (calcularRondaEnfrentamientos(gestor_tc.getRonda_actual()) == gestor_tc.getEnfrentamientos_registrados().size()) {
                             gestor_tc.incRondaActual();
                             restablecerParticipantesTextView();
                             if (gestor_tc.getRonda_actual() <= gestor_tc.getN_rondas()) {
@@ -173,8 +190,6 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
                                 } catch (JSONException e) {
                                     throw new RuntimeException(e);
                                 }
-                            } else {
-                                Toast.makeText(getApplicationContext(), "Fin del torneo, generando resultados...", Toast.LENGTH_SHORT).show();
                             }
                         }
 
@@ -196,6 +211,9 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
         });
     }
 
+    /**
+     * Método para poder draggear elementos tipo VIEW por la pantalla de la aplicación.
+     */
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
         float currentX, currentY;
@@ -238,6 +256,9 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
         return true;
     }
 
+    /**
+     * Genera datos de prueba para un torneo top cut.
+     */
     public void generarDatosPruebaTopCut() {
         gestor_tc.aniadirParticipanteTC(new Participante_Tipo_TC(0, "Juan", "DMN", 1));
         gestor_tc.aniadirParticipanteTC(new Participante_Tipo_TC(1, "Pedro", "MSG", 1));
@@ -253,10 +274,14 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
         gestor_tc.setPartidas_set(5);
         gestor_tc.setJugadores_iniciales(gestor_tc.getLista_participantes().size());
         gestor_tc.setNum_pools(4);
-        gestor_tc.setLoser_bracket(false);
+        gestor_tc.setLoser_bracket(true);
 
     }
 
+    /**
+     * Genera vistas de TextView para cada participante del torneo y los coloca en el diseño especificado.
+     * @param containerLayout El FrameLayout donde se colocarán los TextViews de los participantes.
+     */
     public void cargarParticipantesTextView(FrameLayout containerLayout) {
 
         Set<Integer> coloresUsados = new HashSet<>();
@@ -265,20 +290,20 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
         int largoTv = 100;
         int margen = 15;
 
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < gestor_tc.getJugadores_iniciales() / 4; j++) {
+        for (int i = 0; i < gestor_tc.getJugadores_iniciales() / 4; i++) {
+            for (int j = 0; j < 4; j++) {
                 TextView tv_part = new TextView(getApplicationContext());
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                         anchoTv,
                         largoTv
                 );
                 tv_part.setLayoutParams(layoutParams);
-                tv_part.setText(gestor_tc.getLista_participantes().get(i + j * 4).getAlias());
+                tv_part.setText(gestor_tc.getLista_participantes().get(i*4 + j).getAlias());
                 tv_part.setTextColor(Color.BLACK);
                 tv_part.setGravity(Gravity.CENTER);
                 tv_part.setBackgroundColor(generarColorAleatorio(coloresUsados));
-                tv_part.setTranslationX(i * (anchoTv + margen) + margen);
-                tv_part.setTranslationY(j * (largoTv + margen) + margen + limitePantallaBracket);
+                tv_part.setTranslationX(j * (anchoTv + margen) + margen);
+                tv_part.setTranslationY(i * (largoTv + margen) + margen + limitePantallaBracket);
                 tv_part.setOnTouchListener(this);
 
                 containerLayout.addView(tv_part);
@@ -287,26 +312,41 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
         }
     }
 
+    /**
+     * Actualiza las vistas de los participantes en función del progreso del torneo y los resultados.
+     */
     public void restablecerParticipantesTextView() {
 
         int anchoTv = 1000 / 4;
         int largoTv = 100;
         int margen = 15;
 
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < gestor_tc.getJugadores_iniciales() / 4; j++) {
-                TextView tv_part = lista_tv_jugadores.get(i + j * 4);
-                if (gestor_tc.getLista_participantes().get(i + j * 4).getEliminado() == 2 && gestor_tc.isLoser_bracket()) {
-                    //tv_part.setBackgroundColor();
-                } else if (gestor_tc.getLista_participantes().get(i + j * 4).getEliminado() == 1) {
-                    //tv_part.setBackgroundColor();
+        for (int i = 0; i < gestor_tc.getJugadores_iniciales() / 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                TextView tv_part = lista_tv_jugadores.get(i*4 + j);
+                if (gestor_tc.getLista_participantes().get(i*4 + j).getEliminado() == 2 && gestor_tc.isLoser_bracket()) {
+                    // Rojo y Blanco si esta eliminado del torneo
+                    tv_part.setTextColor(Color.WHITE);
+                    tv_part.setBackgroundColor(Color.RED);
+                } else if (gestor_tc.getLista_participantes().get(i*4 + j).getEliminado() == 1 && !gestor_tc.isLoser_bracket()) {
+                    // Rojo y Blanco si esta eliminado del torneo
+                    tv_part.setTextColor(Color.WHITE);
+                    tv_part.setBackgroundColor(Color.RED);
+                } else if(gestor_tc.getLista_participantes().get(i*4 + j).getEliminado() == 1 && gestor_tc.isLoser_bracket()) {
+                    // Azul y Blanco para loser bracket
+                    tv_part.setTextColor(Color.WHITE);
+                    tv_part.setBackgroundColor(Color.BLUE);
                 }
-                tv_part.setTranslationX(i * (anchoTv + margen) + margen);
-                tv_part.setTranslationY(j * (largoTv + margen) + margen + limitePantallaBracket);
+                tv_part.setTranslationX(j * (anchoTv + margen) + margen);
+                tv_part.setTranslationY(i * (largoTv + margen) + margen + limitePantallaBracket);
             }
         }
     }
 
+    /**
+     * Cuenta el número de participantes que están actualmente en el bracket.
+     * @return El número de participantes en el bracket.
+     */
     public int numJugadoresEnBracket() {
         int num_jugadores = 0;
         int[] loc = new int[2];
@@ -321,8 +361,12 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
         return num_jugadores;
     }
 
+    /**
+     * Elimina un archivo JSON temporal utilizado para almacenar datos del torneo.
+     * @param nombreDirectorio El nombre del directorio donde se encuentra el archivo temporal.
+     */
     public void borrarArchivoJsonTemporal(String nombreDirectorio) {
-        String fileName = "torneo_sw_tmp.json";
+        String fileName = "torneo_tc_tmp.json";
         File directory = new File(getApplicationContext().getExternalFilesDir(null), nombreDirectorio);
         File file = null;
         if (directory.exists()) {
@@ -336,6 +380,10 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
         }
     }
 
+    /**
+     * Devuelve el participante que está representado por la vista de TextView tv_j1.
+     * @return El participante representado por tv_j1.
+     */
     public Participante_Tipo_TC devolverJugadorJ1TextView() {
 
         Participante_Tipo_TC j1 = null;
@@ -359,6 +407,10 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
         return j1;
     }
 
+    /**
+     * Devuelve el participante que está representado por la vista de TextView tv_j2.
+     * @return El participante representado por tv_j2.
+     */
     public Participante_Tipo_TC devolverJugadorJ2TextView() {
 
         Participante_Tipo_TC j2 = null;
@@ -382,6 +434,10 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
         return j2;
     }
 
+    /**
+     * Valida si los datos ingresados en los EditTexts para los resultados de los jugadores son correctos.
+     * @return True si los datos son válidos, False si no lo son.
+     */
     public boolean comprobarEditText() {
         boolean correctos = true;
         try {
@@ -398,6 +454,11 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
         return correctos;
     }
 
+    /**
+     * Calcula el número total de enfrentamientos para una ronda específica del torneo.
+     * @param ronda El número de la ronda para la que se desea calcular el número de enfrentamientos.
+     * @return El número total de enfrentamientos para la ronda especificada.
+     */
     public int calcularRondaEnfrentamientos(int ronda) {
         int enfrentamientosR;
         // Siguiendo la siguiente progresion de enfrentamientos: jug/2 -> jug/4 -> jug/8 ...  Se que tengo que registrar 4 -> 6 -> 7
@@ -419,21 +480,49 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
         return enfrentamientosR;
     }
 
-    public static int generarColorAleatorio(Set<Integer> usedColors) {
+    /**
+     * Determina si el torneo ha alcanzado la fase de la final real, donde solo quedan dos participantes.
+     * @return True si el torneo ha alcanzado la final real, False en caso contrario.
+     */
+    public boolean calcularFinalReal() {
+        int elminados = 0;
+        boolean es_final = true;
+        for (Participante_Tipo_TC part: gestor_tc.getLista_participantes()) {
+           if (gestor_tc.isLoser_bracket()) {
+               if (part.getEliminado() == 2) {
+                   elminados++;
+               }
+           } else {
+               if (part.getEliminado() == 1) {
+                   elminados++;
+               }
+           }
+        }
+
+        es_final = elminados == gestor_tc.getJugadores_iniciales() - 2;
+        return es_final;
+    }
+
+    /**
+     * Genera un color aleatorio que no ha sido utilizado previamente.
+     * @param coloresUsados Un conjunto de colores que ya han sido utilizados.
+     * @return Un color RGB aleatorio que no está presente en el conjunto de colores utilizados previamente.
+     */
+    public static int generarColorAleatorio(Set<Integer> coloresUsados) {
         int color;
         Random RANDOM = new Random();
-        usedColors.add(Color.argb(255, 0, 0, 255));
-        usedColors.add(Color.argb(255, 255, 0, 0));
+        coloresUsados.add(Color.argb(255, 0, 0, 255));
+        coloresUsados.add(Color.argb(255, 255, 0, 0));
         // ACCESIBILIDAD
         int minRGBValue = 150;
-        usedColors.add(Color.BLACK);
+        coloresUsados.add(Color.BLACK);
         do {
             int red = minRGBValue + RANDOM.nextInt(256 - minRGBValue);
             int green = minRGBValue + RANDOM.nextInt(256 - minRGBValue);
             int blue = minRGBValue + RANDOM.nextInt(256 - minRGBValue);
             color = Color.argb(255, red, green, blue);
-        } while (usedColors.contains(color));
-        usedColors.add(color);
+        } while (coloresUsados.contains(color));
+        coloresUsados.add(color);
         return color;
     }
 

@@ -213,8 +213,8 @@ public class BFragmentInRes extends Fragment {
                 if (gestor_sw.es_multijugador()){
                     // Si estamos en multi -> Tu posicion es lo que el usuario ha introducido en el ET correspondiente
                     structDatosGuardar[pos].posicion = Integer.parseInt(etJugadorI.getText().toString());
-                    // Si estamos en multi -> Es victoria si la posicion introducida es > la mitad de los jugadores por partida, en caso contrario es derrota
-                    if(Integer.parseInt(etJugadorI.getText().toString()) >= (gestor_sw.getJugadores_partida()/2) ) {
+                    // Si estamos en multi -> Es victoria si la posicion introducida es < la mitad de los jugadores por partida, en caso contrario es derrota
+                    if(Integer.parseInt(etJugadorI.getText().toString()) <= (gestor_sw.getJugadores_partida()/2) ) {
                         structDatosGuardar[pos].victorias = 1;
                         structDatosGuardar[pos].derrotas = 0;
                     } else {
