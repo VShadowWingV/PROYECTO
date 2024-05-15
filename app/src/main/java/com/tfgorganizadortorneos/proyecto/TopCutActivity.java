@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -53,7 +55,7 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
     float limitePantallaBracket;
     boolean esFinal = false;
 
-    @SuppressLint("SourceLockedOrientationActivity")
+    @SuppressLint({"SourceLockedOrientationActivity", "ClickableViewAccessibility"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -134,7 +136,8 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
 
                                 // Si es la final real (nos quedan solo dos participantes sin eliminar) el siguiente enfrentamiento que añadamos
                                 // finalizará el torneo
-                                if (calcularFinalReal()) {
+                                if (calcularFinalReal() && !esFinal) {
+                                    Toast.makeText(getApplicationContext(), "FINAL", Toast.LENGTH_SHORT).show();
                                     esFinal = true;
                                 } else if (esFinal) {
                                     Toast.makeText(getApplicationContext(),"Finalizando torneo, generando resultados..." , Toast.LENGTH_SHORT).show();
@@ -171,10 +174,17 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
 
                                 // Si es la final real (nos quedan solo dos participantes sin eliminar) el siguiente enfrentamiento que añadamos
                                 // finalizará el torneo
-                                if (calcularFinalReal()) {
+                                if (calcularFinalReal() && !esFinal) {
+                                    Toast.makeText(getApplicationContext(), "FINAL", Toast.LENGTH_SHORT).show();
                                     esFinal = true;
                                 } else if (esFinal) {
                                     Toast.makeText(getApplicationContext(),"Finalizando torneo, generando resultados..." , Toast.LENGTH_SHORT).show();
+                                    try {
+                                        gestor_tc.generarArchivoJSONTorneoTopCut("TorneoTC", String.valueOf(Math.abs(gestor_tc.hashCode())), getApplicationContext());
+                                        borrarArchivoJsonTemporal("TorneoTC");
+                                    } catch (JSONException e) {
+                                        throw new RuntimeException(e);
+                                    }
                                 }
                             }
                         }
@@ -201,6 +211,34 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
                         Toast.makeText(getApplicationContext(), "Datos incorrectos", Toast.LENGTH_SHORT).show();
                     }
                 }
+            }
+        });
+        bt_sig.setOnTouchListener(new View.OnTouchListener() {
+            private boolean isLongPressed = false;
+            Handler handler = new Handler(Looper.getMainLooper());;
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    isLongPressed = true;
+                    restablecerParticipantesTextView();
+                }
+            };
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        handler.postDelayed(runnable, 3000); // Ejecuta después de 3 segundos
+                        break;
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
+                        handler.removeCallbacks(runnable);
+                        if (isLongPressed) {
+                            isLongPressed = false;
+                            return true;
+                        }
+                        break;
+                }
+                return false;
             }
         });
 
@@ -333,8 +371,8 @@ public class TopCutActivity extends AppCompatActivity implements View.OnTouchLis
                     tv_part.setTextColor(Color.WHITE);
                     tv_part.setBackgroundColor(Color.RED);
                 } else if(gestor_tc.getLista_participantes().get(i*4 + j).getEliminado() == 1 && gestor_tc.isLoser_bracket()) {
-                    // Verde y Blanco para loser bracket
-                    tv_part.setTextColor(Color.WHITE);
+                    // Verde y Rojo para loser bracket
+                    tv_part.setTextColor(Color.RED);
                     tv_part.setBackgroundColor(Color.GREEN);
                 }
                 tv_part.setTranslationX(j * (anchoTv + margen) + margen);
